@@ -200,10 +200,6 @@ void setup() {
     displayPrint("[OK] load config");
   }
 
-  // Start UART interface  
-  cli.begin();
-  displayPrint("[OK] serial cli");
-
   // Start BLE interface
   // bleConfig.begin(&appConfig);
   // bleScanner.begin();
@@ -214,13 +210,13 @@ void setup() {
   SPI.begin(Wiring::SX1262::SCK, Wiring::SX1262::MISO, Wiring::SX1262::MOSI, Wiring::SX1262::CS);
   if (!setupRadio()) {    
     displayPrint("[FAILED] LORA");
-    while (true);
+  } else {
+    displayPrint("[OK] LORA");
+    lora.setDio1Action(onLoraRx); 
+    pinMode(Wiring::SX1262::RFSW, OUTPUT);
+    digitalWrite(Wiring::SX1262::RFSW, HIGH);
+    lora.startReceive();
   }
-  displayPrint("[OK] LORA");
-  lora.setDio1Action(onLoraRx); 
-  pinMode(Wiring::SX1262::RFSW, OUTPUT);
-  digitalWrite(Wiring::SX1262::RFSW, HIGH);
-  lora.startReceive();
   
 
   // // Start RTC module  
@@ -259,6 +255,10 @@ void setup() {
   // } else {
   //   displayPrint("[SKIP] NTP");
   // }
+
+  // Start UART interface  
+  cli.begin();
+  displayPrint("[OK] serial cli");
 
   setPixelSignal(PixelSignal::Ok);  
   displayPrint("Station Ready");
