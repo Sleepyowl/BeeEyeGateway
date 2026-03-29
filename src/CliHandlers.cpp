@@ -105,12 +105,3 @@ void cmdSetInfluxPass(const char* pass) {
   appConfig.influxPass[n] = '\0';
   Serial.printf("InfluxDB Pass = %s\n", pass);
 }
-
-void cmdSetRf24Channel(const char* s) {
-  constexpr int maxch = 125;
-  int ch = 0;
-  sscanf(s, "%d", &ch);
-  ch = min(ch, maxch);
-  appConfig.rf24Channel = ch;
-  Serial.printf("RF24 Channel = %d\n", ch);
-}

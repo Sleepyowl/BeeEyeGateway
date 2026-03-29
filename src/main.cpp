@@ -53,7 +53,6 @@ void cmdScanWifi(const char* arg);
 void cmdSetInfluxUrl(const char* arg);
 void cmdSetInfluxUser(const char* arg);
 void cmdSetInfluxPass(const char* arg);
-void cmdSetRf24Channel(const char* arg);
 
 CommandEntry consoleCommands[] = {
   {"status",    cmdStatus,             "status              - display unit status"},
@@ -67,8 +66,7 @@ CommandEntry consoleCommands[] = {
   {"timezone",  cmdSetTz,              "timezone +-HH:MM    - sets timezone"},
   {"influxurl", cmdSetInfluxUrl,       "influxurl <url>     - set InfluxDB server URL (max 256 chars)"},
   {"influxuser",cmdSetInfluxUser,      "influxuser <user>   - set InfluxDB username"},
-  {"influxpass",cmdSetInfluxPass,      "influxpass <pass>   - set InfluxDB password"},
-  {"rf24ch",    cmdSetRf24Channel,        "rf24ch <channel>    - set RF24 channel"}
+  {"influxpass",cmdSetInfluxPass,      "influxpass <pass>   - set InfluxDB password"}
 };
 
 /*************************************
