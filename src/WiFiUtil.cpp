@@ -15,13 +15,15 @@ bool initWifi() {
   WiFi.mode(WIFI_STA);
   delay(100);
   WiFi.persistent(false);
-  WiFi.setAutoReconnect(true);
+  WiFi.setAutoReconnect(false);
   WiFi.setSleep(true);
   WiFi.setTxPower(WIFI_POWER_8_5dBm);
   if(strlen(appConfig.ssid) > 0) {
     displayPrintf("Connecting to %s...", appConfig.ssid);
     if(connectWifi()) {      
       displayPrintf("Connected to %s (%d dBm)", appConfig.ssid, WiFi.RSSI());
+    } else {
+      displayPrint("[FAILED] WiFi connection");  
     }
   } else {    
     displayPrint("[FATAL] No WiFi settings found");
@@ -59,12 +61,12 @@ bool connectWifi(uint32_t timeout_ms) {
     Serial.println("WiFi mutex not initialized"); 
     return false; 
   }
-  
+
   if (strlen(appConfig.ssid) == 0) { 
     Serial.println("SSID not set"); 
     return false; 
   }
-
+  
   const auto passLen = strlen(appConfig.pass);
   if (passLen < 8 || passLen > 63) {
     Serial.println("Password length invalid (8–63)");
@@ -76,22 +78,33 @@ bool connectWifi(uint32_t timeout_ms) {
     return false;
   }
 
+  WiFi.setAutoReconnect(false);
+
+  if(WiFi.isConnected()) {
+    WiFi.disconnect();
+  }
+
   if (WiFi.status() == WL_CONNECTED && WiFi.SSID() == appConfig.ssid) {
     xSemaphoreGive(wifiLock);
     return true; // already connected to desired SSID
   }
 
+  Serial.printf("WiFi connecting to %s\n", appConfig.ssid); 
   WiFi.begin(appConfig.ssid, appConfig.pass);
-
-  uint32_t start = millis();
-  while (WiFi.status() != WL_CONNECTED && (millis() - start) < timeout_ms) {
-    vTaskDelay(pdMS_TO_TICKS(100));
+  uint8_t status = WiFi.waitForConnectResult(timeout_ms);
+  Serial.printf("WiFi connect status = %u\n", status);  
+  bool ok = status == WL_CONNECTED;
+  if (!ok) {     
+    if (status == WL_NO_SSID_AVAIL) {    
+      Serial.println("WiFi connect failed: invalid SSID");
+    } else {
+      Serial.println("WiFi connect failed");
+    }
+  } else {
+    Serial.println("WiFi connected");
+    WiFi.setAutoReconnect(true);
   }
 
-  bool ok = (WiFi.status() == WL_CONNECTED);
-  if (!ok) { 
-    Serial.println("WiFi connect timeout"); 
-  }
   xSemaphoreGive(wifiLock);
   return ok;
 }
