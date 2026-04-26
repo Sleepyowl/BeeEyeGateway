@@ -1,0 +1,6 @@
+board:
+  name: base_station
+  full_name: BeeEye LoRa Base Station
+  vendor: BeeEye
+  socs:
+  - name: esp32c6

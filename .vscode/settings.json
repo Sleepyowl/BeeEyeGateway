@@ -1,9 +1,12 @@
 {
-    "files.associations": {
-        "array": "cpp",
-        "bitset": "cpp",
-        "string_view": "cpp",
-        "initializer_list": "cpp",
-        "span": "cpp"
+  "terminal.integrated.profiles.linux": {
+    "zephyr": {
+      "path": "/bin/bash",
+      "args": [
+        "-c",
+        "source $ZEPHYR_BASE/../.venv/bin/activate && export BOARD_ROOT=${workspaceFolder} && exec bash"
+      ]
     }
+  },
+  "terminal.integrated.defaultProfile.linux": "zephyr"
 }

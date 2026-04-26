@@ -1,0 +1,5 @@
+source "Kconfig.zephyr"
+
+config DISPLAY_LOG_BACKEND
+    bool "Enable display log backend"
+    default n

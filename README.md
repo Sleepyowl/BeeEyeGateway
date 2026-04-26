@@ -1,21 +1,46 @@
 # BeeEye Gateway
 
-This is the firmware for a custom LoRa gateway based on ESP32 and SX126x. It receives metrics over LoRa and posts them to InfluxDB (over WiFi).
+Firmware for a sensor data forwarder based on ESP32-C6 and SX126x.
 
-## Building and deploying
+Receives metrics over LoRa and sends them to InfluxDB over WiFi.
 
-- Install Visual Studio Code
-- Install PlatformIO extension in Visual Studio Code
-- Open the solution
-- Open command palette (F1) and select `PlatformIO: Upload`
+Configuration is done over UART.
 
-## Configuring
+## Build and deploy
 
-Device must be configured via serial port.
+Requires Zephyr SDK.
 
-- Plug the device to your PC
-- Connect to the device with serial terminal (for instance, using command `PlatformIO: Serial Monitor`)
-- Cofigure settings (use help for list of commands)
-- Don't forget to save settings with `save` command
+Install it by following the official guide:
+https://docs.zephyrproject.org/latest/develop/getting_started/index.html
 
+Build and flash:
+```bash
+west build --pristine --board base_station//hpcore
+west flash
+```
 
+## Configure
+
+Configuration is done via serial shell.
+
+Connect the device to a USB port on your PC and open a serial terminal:
+```bash
+tio /dev/ttyACM0 -b 115200
+```
+
+Set up WiFi:
+```
+wifi cred add -s <SSID> -p <PASS> -k 1
+mgr wifissid <SSID>
+mgr save
+```
+
+Set up InfluxDB:
+```
+mgr influxurl http://your.instance/write?db=target_db
+mgr influxuser your_influx_user
+mgr influxpass your_influx_pass
+mgr save
+```
+
+Restart the device with `mgr restart` or by reconnecting USB.

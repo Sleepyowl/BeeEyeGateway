@@ -1,0 +1,166 @@
+/*
+ * Copyright (c) 2023 Espressif Systems (Shanghai) Co., Ltd.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/dts-v1/;
+
+#include <zephyr/dt-bindings/led/led.h>
+
+#include <espressif/esp32c6/esp32c6_wroom_n4.dtsi>
+#include "base_station_hpcore-pinctrl.dtsi"
+#include <zephyr/dt-bindings/input/input-event-codes.h>
+#include <espressif/partitions_0x0_default_4M.dtsi>
+
+
+/ {
+	model = "base_station HP Core";
+	compatible = "espressif,esp32c6";
+
+	chosen {
+		zephyr,sram = &sramhp;
+		zephyr,console = &usb_serial;
+		zephyr,shell-uart = &usb_serial;
+		zephyr,flash = &flash0;
+		zephyr,code-partition = &slot0_partition;
+		zephyr,ieee802154 = &ieee802154;
+		zephyr,display = &ssd1306;
+	};
+
+	aliases {
+		watchdog0 = &wdt0;
+	};
+
+	gpio_keys {
+		compatible = "gpio-keys";
+	};
+
+	leds {
+		compatible = "gpio-leds";
+
+		led0: led_0 {
+			gpios = <&gpio0 14 GPIO_ACTIVE_HIGH>;
+			label = "Red LED 0";
+		};
+	};
+};
+
+&uart0 {
+	status = "okay";
+	current-speed = <115200>;
+	pinctrl-0 = <&uart0_default>;
+	pinctrl-names = "default";
+};
+
+&trng0 {
+	status = "okay";
+};
+
+&i2c0 {
+	status = "okay";
+	clock-frequency = <I2C_BITRATE_STANDARD>;
+	pinctrl-0 = <&i2c0_default>;
+	pinctrl-names = "default";
+
+	ssd1306: oled@3c {
+		compatible = "sinowealth,sh1106";
+		reg = <0x3c>;
+		width = <128>;
+		height = <64>;
+		segment-offset = <0>;
+		page-offset = <0>;
+		display-offset = <0>;
+		multiplex-ratio = <63>;
+		segment-remap;
+		com-invdir;
+		prechargep = <0x22>;
+    };
+
+ 	rv3028: rv3028@52 {
+		status = "okay";
+        compatible = "microcrystal,rv3028";
+        reg = <0x52>;        
+		backup-switch-mode = "level";
+		trickle-resistor-ohms = <15000>;		
+    };
+
+
+};
+
+&i2s {
+	status = "okay";
+	pinctrl-0 = <&i2s_default>;
+	pinctrl-names = "default";
+};
+
+&spi2 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "okay";
+	pinctrl-0 = <&spim2_default>;
+	pinctrl-names = "default";
+
+	cs-gpios = <&gpio0 22 GPIO_ACTIVE_LOW>;
+
+	lora: sx1262@0 {
+        compatible = "semtech,sx1262";
+        reg = <0>;
+        status = "okay";
+        spi-max-frequency = <400000>;
+
+        reset-gpios = <&gpio0 21 GPIO_ACTIVE_LOW>;
+        busy-gpios  = <&gpio0 0 GPIO_ACTIVE_HIGH>;
+        dio1-gpios  = <&gpio0 23 GPIO_ACTIVE_HIGH>;
+        rx-enable-gpios = <&gpio0 1 GPIO_ACTIVE_HIGH>;
+        dio2-tx-enable;
+
+        /*
+            Acceptable TXCO voltage constants:
+            #define SX126X_DIO3_TCXO_1V6	0x00
+            #define SX126X_DIO3_TCXO_1V7	0x01
+            #define SX126X_DIO3_TCXO_1V8	0x02
+            #define SX126X_DIO3_TCXO_2V2	0x03
+            #define SX126X_DIO3_TCXO_2V4	0x04
+            #define SX126X_DIO3_TCXO_2V7	0x05
+            #define SX126X_DIO3_TCXO_3V0	0x06
+            #define SX126X_DIO3_TCXO_3V3	0x07
+         */
+        dio3-tcxo-voltage = <2>; 
+        tcxo-power-startup-delay-ms = <500>;
+    };
+};
+
+&gpio0 {
+	status = "okay";
+};
+
+&wdt0 {
+	status = "okay";
+};
+
+&wdt1 {
+	status = "okay";
+};
+
+&wifi {
+	status = "okay";
+};
+
+&ieee802154 {
+	status = "okay";
+};
+
+&esp32_bt_hci {
+	status = "okay";
+};
+
+&dma {
+    status = "okay";
+};
+
+
+&usb_serial {
+    status = "okay";
+	current-speed = <115200>;
+};
