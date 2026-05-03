@@ -33,12 +33,14 @@ static int build_influx_line(char *buf, size_t len, const struct measure *measur
 
   switch (measure->type) {
   case MEASURE_TYPE_BATTERY:
-    return snprintf(buf, len, "battery_mv,sensor=%s value=%u", saddr, measure->_data.mV);      
+    return snprintf(buf, len, "battery_mv,sensor=%s value=%u", saddr, measure->data.bat.mV);      
   case MEASURE_TYPE_TEMPERATURE:
-    return snprintf(buf, len, "temperature,sensor=%s value=%f", saddr, (double)measure->_data.tempC); 
+    return snprintf(buf, len, "temperature,sensor=%s value=%f", saddr, (double)measure->data.th.tempC); 
   case MEASURE_TYPE_TEMP_AND_HUMIDITY:
     return snprintf(buf, len, "temperature,sensor=%s value=%f\nhumidity,sensor=%s value=%f", 
-                        saddr, (double)measure->_data.tempC, saddr, (double)measure->hum);
+                        saddr, (double)measure->data.th.tempC, saddr, (double)measure->data.th.hum);
+  case MEASURE_TYPE_WEIGHT:
+    return snprintf(buf, len, "weight,sensor=%s value=%f", saddr, (double)measure->data.w.weight); 
   default:
     return -EINVAL;
   }

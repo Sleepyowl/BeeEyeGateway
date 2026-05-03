@@ -72,13 +72,17 @@ static void process_measures(const struct measure *measures, uint8_t count) {
 
         switch (current->type) {
             case MEASURE_TYPE_BATTERY:
-                display_printf("bat=%dmV\n", current->_data.mV);
+                display_printf("bat=%dmV\n", current->data.bat.mV);
                 break;
             case MEASURE_TYPE_TEMPERATURE:
-                display_printf("t=%.1f\n", (double)current->_data.tempC);
+                display_printf("t=%.1f\n", (double)current->data.th.tempC);
                 break;
             case MEASURE_TYPE_TEMP_AND_HUMIDITY:
-                display_printf("t=%.1f, h=%.1f%%\n", (double)current->_data.tempC, (double)current->hum);
+                display_printf("t=%.1f, h=%.1f%%\n", 
+                    (double)current->data.th.tempC, (double)current->data.th.hum);
+                break;
+            case MEASURE_TYPE_WEIGHT:
+                display_printf("w=%.1f\n", (double)current->data.w.weight);
                 break;
             default:
                 display_printf("Unsupported measure type %d\n", current->type);
